@@ -114,9 +114,16 @@ io.on("connection", (socket) => {
     switchTurn(token);
   });
 
-  socket.on("resetRequest", () => {
+  socket.on("resetRequest", ({confirmReset}) => {
     const token = findRoomBySocket(socket.id);
     if (!token) return;
+
+    if(!confirmReset){
+      socket.emit("waitingResetResponse", {});
+      socket.to(token).emit("confirmResetRequest", {});
+      return;
+    }
+
     resetRoom(token);
   });
 
