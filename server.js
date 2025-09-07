@@ -5,16 +5,18 @@ const { Server } = require("socket.io");
 
 const app = express();
 const server = http.createServer(app);
-
+const allowedOrigins = [
+  "https://gomoku-client-qah8.onrender.com"
+]
 app.use(cors({
-  origin: ["https://vmquanglc.github.io"],
+  origin: allowedOrigins,
   methods: ["GET", "POST"],
   credentials: true
 }));
 
 const io = new Server(server, {
   cors: {
-    origin: ["https://vmquanglc.github.io"],
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true
   }
