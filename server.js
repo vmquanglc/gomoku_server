@@ -6,7 +6,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: { origin: "*" },
-  methods: ["GET", "POST"]
+  methods: ["GET", "POST"],
 });
 
 const SIZE = 18;
@@ -109,6 +109,8 @@ io.on("connection", (socket) => {
     const player = room.players.find((p) => p.id === socket.id);
     if (!player || room.currentPlayer !== player.symbol) return;
 
+    //when passturn, just notifi for opponent
+    socket.to(token).emit("passTurn", {});
     switchTurn(token);
   });
 
@@ -142,7 +144,8 @@ function broadcastRooms() {
   const roomsNow = Object.entries(rooms).map(([id, obj]) => {
     return {
       id,
-      status: obj?.players?.length === 2 ? RoomStatus.Full : RoomStatus.ReadyToPlay,
+      status:
+        obj?.players?.length === 2 ? RoomStatus.Full : RoomStatus.ReadyToPlay,
       createdDate: obj.createdDate,
     };
   });
