@@ -11,6 +11,10 @@ const io = new Server(server, {
 
 const SIZE = 18;
 const TURN_TIME = 60;
+const RoomStatus = {
+  Full: 2,
+  ReadyToPlay: 3,
+};
 
 const rooms = {};
 // { token: { players: [{id, symbol}], currentPlayer, board, timer, timerInterval } }
@@ -30,7 +34,7 @@ io.on("connection", (socket) => {
         board: createBoard(),
         timer: TURN_TIME,
         timerInterval: null,
-        createdDate: new Date().getTime()
+        createdDate: new Date().getTime(),
       };
     }
     const room = rooms[token];
@@ -138,9 +142,8 @@ function broadcastRooms() {
   const roomsNow = Object.entries(rooms).map(([id, obj]) => {
     return {
       id,
-      status:
-        obj?.players?.length === 2,
-      createdDate: obj.createdDate
+      status: obj?.players?.length === 2 ? RoomStatus.Full : RoomStatus.ReadyToPlay,
+      createdDate: obj.createdDate,
     };
   });
   io.to("home").emit("roomsUpdate", roomsNow);
